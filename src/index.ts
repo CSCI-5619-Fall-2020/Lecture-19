@@ -16,7 +16,12 @@ import { GUI3DManager } from "@babylonjs/gui/3D/gui3DManager"
 import { Button3D } from "@babylonjs/gui/3D/controls/button3D"
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock"
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-
+import { Vector3WithInfo } from "@babylonjs/gui/3D/vector3WithInfo"
+import { Animation } from "@babylonjs/core/Animations/animation"
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { EventState } from "@babylonjs/core/Misc/observable";
+import { MeshBuilder } from "@babylonjs/core";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 
 // Side effects
 import "@babylonjs/core/Helpers/sceneHelpers";
@@ -121,14 +126,36 @@ class Game
             }  
         });
 
+        // Create an animation to use for testing purposes
+        var testAnimation = new Animation(
+            "testAnimation", 
+            "position", 75, 
+            Animation.ANIMATIONTYPE_VECTOR3,
+            Animation.ANIMATIONLOOPMODE_CONSTANT
+            );
+
+        var testAnimationKeys = [];
+        testAnimationKeys.push({frame: 0, value: new Vector3(0, 4, 5)});
+        testAnimationKeys.push({frame: 75, value: new Vector3(0, .5, 5)});
+        testAnimation.setKeys(testAnimationKeys);
+
+        var testSphere = MeshBuilder.CreateSphere("testSphere", {diameter: 1}, this.scene);
+        testSphere.position = new Vector3(0, 3, 5);
+        testSphere.animations.push(testAnimation);
+
         // The manager automates some of the GUI creation steps
+        // https://doc.babylonjs.com/divingDeeper/gui/gui3D
         var guiManager = new GUI3DManager(this.scene);
+
+        var testButtonTransform = new TransformNode("testButtonTransform", this.scene);
+        testButtonTransform.rotation.y = 90 * Math.PI / 180;
 
         // Create a test button
         var testButton = new Button3D("testButton");
         guiManager.addControl(testButton);
+        testButton.linkToTransformNode(testButtonTransform);
         testButton.position.y = 1.6;
-        testButton.position.z = 2;     
+        testButton.position.z = 3;     
         testButton.scaling.y = .5;   
 
         // Create the test button text
@@ -155,7 +182,10 @@ class Game
             testButtonMaterial.diffuseColor = hoverColor;
         }
 
-        // See: https://doc.babylonjs.com/divingDeeper/gui/gui3D
+        // Start the animation when the button is selected
+        testButton.onPointerDownObservable.add(() => {
+            this.scene.beginAnimation(testSphere, 0, 75, false);
+        });
 
         this.scene.debugLayer.show(); 
     }

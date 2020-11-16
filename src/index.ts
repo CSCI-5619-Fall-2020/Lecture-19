@@ -7,19 +7,24 @@ import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3, Color3 } from "@babylonjs/core/Maths/math";
 import { UniversalCamera } from "@babylonjs/core/Cameras/universalCamera";
-import { WebXRControllerComponent } from "@babylonjs/core/XR/motionController/webXRControllercomponent";
 import { WebXRInputSource } from "@babylonjs/core/XR/webXRInputSource";
 import { WebXRCamera } from "@babylonjs/core/XR/webXRCamera";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Logger } from "@babylonjs/core/Misc/logger";
 import { GUI3DManager } from "@babylonjs/gui/3D/gui3DManager"
 import { Button3D } from "@babylonjs/gui/3D/controls/button3D"
+import { HolographicButton } from "@babylonjs/gui/3D/controls/holographicButton"
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock"
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Animation } from "@babylonjs/core/Animations/animation"
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { MeshBuilder } from "@babylonjs/core";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture"
+import { StackPanel3D } from "@babylonjs/gui/3D/controls/stackPanel3D"
+import { PlanePanel } from "@babylonjs/gui/3D/controls/planePanel"
+import { CylinderPanel } from "@babylonjs/gui/3D/controls/cylinderPanel"
+import { SpherePanel } from "@babylonjs/gui/3D/controls/spherePanel"
+import { ScatterPanel } from "@babylonjs/gui/3D/controls/scatterPanel"
 
 // Side effects
 import "@babylonjs/core/Helpers/sceneHelpers";
@@ -93,7 +98,8 @@ class Game
             skyboxColor: new Color3(0, 0, 0)
         });
 
-        // Make sure the skybox is not pickable!
+        // Make sure the ground and skybox are not pickable!
+        environment!.ground!.isPickable = false;
         environment!.skybox!.isPickable = false;
 
         // Creates the XR experience helper
@@ -123,53 +129,6 @@ class Game
         testSphere.animations.push(testAnimation);
 
 
-
-        // The manager automates some of the GUI creation steps
-        // https://doc.babylonjs.com/divingDeeper/gui/gui3D
-        var guiManager = new GUI3DManager(this.scene);
-
-        var testButtonTransform = new TransformNode("testButtonTransform", this.scene);
-        testButtonTransform.rotation.y = 90 * Math.PI / 180;
-
-        // Create a test button
-        var testButton = new Button3D("testButton");
-        guiManager.addControl(testButton);
-        testButton.linkToTransformNode(testButtonTransform);
-        testButton.position.y = 1.6;
-        testButton.position.z = 3;     
-        testButton.scaling.y = .5;   
-
-        // Create the test button text
-        var testButtonText = new TextBlock();
-        testButtonText.text = "Hello world!";
-        testButtonText.color = "white";
-        testButtonText.fontSize = 24;
-        testButtonText.scaleY = 2;
-        testButton.content = testButtonText;
-
-        // Type cast the button material so we can change the color
-        var testButtonMaterial = <StandardMaterial>testButton.mesh!.material;
-       
-        // Custom background color
-        var backgroundColor = new Color3(.284, .73, .831);
-        testButtonMaterial.diffuseColor = backgroundColor;
-        testButton.pointerOutAnimation = () => {
-            testButtonMaterial.diffuseColor = backgroundColor;
-        }
-
-        // Custom hover color
-        var hoverColor = new Color3(.752, .53, .735);
-        testButton.pointerEnterAnimation = () => {
-            testButtonMaterial.diffuseColor = hoverColor;
-        }
-
-        // Start the animation when the button is selected
-        testButton.onPointerDownObservable.add(() => {
-            this.scene.beginAnimation(testSphere, 0, 75, false);
-        });
-
-
-        
 
 
         // Manually create a plane for adding static text
@@ -210,6 +169,89 @@ class Game
                 staticTextPlane.parent = null;
             }
         });
+
+
+
+
+        // The manager automates some of the GUI creation steps
+        var guiManager = new GUI3DManager(this.scene);
+
+        // Create a test button
+        var testButton = new Button3D("testButton");
+        guiManager.addControl(testButton);
+
+        // This must be done after addControl to overwrite the default content
+        testButton.position = new Vector3(0, 1.6, 3); 
+        testButton.scaling.y = .5;   
+
+        var testButtonTransform = new TransformNode("testButtonTransform", this.scene);
+        testButtonTransform.rotation.y = 90 * Math.PI / 180;
+        testButton.linkToTransformNode(testButtonTransform);
+
+        // Create the test button text
+        var testButtonText = new TextBlock();
+        testButtonText.text = "Hello world!";
+        testButtonText.color = "white";
+        testButtonText.fontSize = 24;
+        testButtonText.scaleY = 2;
+        testButton.content = testButtonText;
+
+        // Type cast the button material so we can change the color
+        var testButtonMaterial = <StandardMaterial>testButton.mesh!.material;
+       
+        // Custom background color
+        var backgroundColor = new Color3(.284, .73, .831);
+        testButtonMaterial.diffuseColor = backgroundColor;
+        testButton.pointerOutAnimation = () => {
+            testButtonMaterial.diffuseColor = backgroundColor;
+        }
+
+        // Custom hover color
+        var hoverColor = new Color3(.752, .53, .735);
+        testButton.pointerEnterAnimation = () => {
+            testButtonMaterial.diffuseColor = hoverColor;
+        }
+
+        // Start the animation when the button is selected
+        testButton.onPointerDownObservable.add(() => {
+            this.scene.beginAnimation(testSphere, 0, 75, false);
+        });
+
+
+
+
+        // Create a panel to automatically layout GUI controls
+        // See: https://doc.babylonjs.com/divingDeeper/gui/gui3D
+
+        //var panel = new StackPanel3D();
+        //var panel = new PlanePanel();
+        //var panel = new CylinderPanel();
+        //var panel = new SpherePanel();
+        var panel = new ScatterPanel();
+        guiManager.addControl(panel);
+
+        panel.position = new Vector3(0, 1.6, 3); 
+        panel.margin = 0.25;
+        panel.blockLayout = true;
+        panel.rows = 4;
+        
+        // Create 20 holographic buttons
+        for(let i=0; i < 20; i++)
+        {
+            let button = new HolographicButton("button");
+            panel.addControl(button);
+
+            let buttonText = new TextBlock();
+            buttonText.text = "" + (i+1);
+            buttonText.color = "white";
+            buttonText.fontSize = 64;
+            button.content = buttonText;  
+
+            button.onPointerDownObservable.add(() => {
+                this.scene.beginAnimation(testSphere, 0, 75, false);
+            });
+        }
+
 
 
         this.scene.debugLayer.show(); 

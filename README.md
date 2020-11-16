@@ -9,6 +9,10 @@ Detailed explanation of this code can be found in the lecture video [LINK TO BE 
 3. Creating a button in 3D space
 4. Using panels to layout more complex GUIs
 
+## Code Bounty
+
+Anyone that can figure out a bug fix or workaround for the incorrect depth testing with GUI components on the Oculus Quest will earn 1 bonus point on their final grade!  (Only one person per solution can earn this bounty.)
+
 ## Participation Exercise
 
 There is no participation exercise for this lecture.  Instead, check Canvas for the Quiz, which is due on at 10pm CST on Tuesday, November 17.

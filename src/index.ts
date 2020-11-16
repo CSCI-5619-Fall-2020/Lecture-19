@@ -184,6 +184,7 @@ class Game
         testButton.position = new Vector3(0, 1.6, 3); 
         testButton.scaling.y = .5;   
 
+        // Link a transform node so we can move the button around
         var testButtonTransform = new TransformNode("testButtonTransform", this.scene);
         testButtonTransform.rotation.y = 90 * Math.PI / 180;
         testButton.linkToTransformNode(testButtonTransform);

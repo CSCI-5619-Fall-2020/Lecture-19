@@ -1,6 +1,6 @@
 # Lecture 19: Immersive GUIs
 
-Detailed explanation of this code can be found in the lecture video [LINK TO BE ADDED].
+Detailed explanation of this code can be found in the [lecture video](https://mediaspace.umn.edu/media/1_euxqkbgi).
 
 ## Topics
 
@@ -9,9 +9,9 @@ Detailed explanation of this code can be found in the lecture video [LINK TO BE 
 3. Creating a button in 3D space
 4. Using panels to layout more complex GUIs
 
-## Code Bounty
+## Bug Bounty
 
-Anyone that can figure out a bug fix or workaround for the incorrect depth testing with GUI components on the Oculus Quest will earn 1 bonus point on their final grade!  (Only one person per solution can earn this bounty.)
+Anyone that can figure out a bug fix or workaround for the incorrect depth testing with GUI components on the Oculus Quest will earn 1 bonus point on their final grade!  (Only one person per unique solution can earn this bounty.)
 
 ## Participation Exercise
 

@@ -4,11 +4,14 @@ Detailed explanation of this code can be found in the lecture video [LINK TO BE 
 
 ## Topics
 
-1. TBD
+1. 2D vs 3D graphical user interfaces
+2. Adding a static text tooltip to the controller
+3. Creating a button in 3D space
+4. Using panels to layout more complex GUIs
 
 ## Participation Exercise
 
-There is no participation exercise for this lecture.
+There is no participation exercise for this lecture.  Instead, check Canvas for the Quiz, which is due on at 10pm CST on Tuesday, November 17.
 
 ## License
 

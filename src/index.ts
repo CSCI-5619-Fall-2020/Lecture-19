@@ -16,23 +16,14 @@ import { GUI3DManager } from "@babylonjs/gui/3D/gui3DManager"
 import { Button3D } from "@babylonjs/gui/3D/controls/button3D"
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock"
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { Vector3WithInfo } from "@babylonjs/gui/3D/vector3WithInfo"
 import { Animation } from "@babylonjs/core/Animations/animation"
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { EventState } from "@babylonjs/core/Misc/observable";
 import { MeshBuilder } from "@babylonjs/core";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture"
 
 // Side effects
 import "@babylonjs/core/Helpers/sceneHelpers";
 import "@babylonjs/inspector";
-
-enum LocomotionMode 
-{
-    viewDirected,
-    handDirected,
-    teleportation
-}
 
 class Game 
 { 
@@ -114,18 +105,6 @@ class Game
         // Remove default teleportation
         xrHelper.teleportation.dispose();
 
-        // Assign the left and right controllers to member variables
-        xrHelper.input.onControllerAddedObservable.add((inputSource) => {
-            if(inputSource.uniqueId.endsWith("right"))
-            {
-                this.rightController = inputSource;
-            }
-            else 
-            {
-                this.leftController = inputSource;
-            }  
-        });
-
         // Create an animation to use for testing purposes
         var testAnimation = new Animation(
             "testAnimation", 
@@ -142,6 +121,8 @@ class Game
         var testSphere = MeshBuilder.CreateSphere("testSphere", {diameter: 1}, this.scene);
         testSphere.position = new Vector3(0, 3, 5);
         testSphere.animations.push(testAnimation);
+
+
 
         // The manager automates some of the GUI creation steps
         // https://doc.babylonjs.com/divingDeeper/gui/gui3D
@@ -187,20 +168,57 @@ class Game
             this.scene.beginAnimation(testSphere, 0, 75, false);
         });
 
+
+        
+
+
+        // Manually create a plane for adding static text
+        var staticTextPlane = MeshBuilder.CreatePlane("textPlane", {}, this.scene);
+        staticTextPlane.position.y = .1;
+        staticTextPlane.isPickable = false;
+
+        // Create a dynamic texture for adding GUI controls
+        var staticTextTexture = AdvancedDynamicTexture.CreateForMesh(staticTextPlane, 512, 512);
+
+        // Create a static text block
+        var staticText = new TextBlock();
+        staticText.text = "Hello world!";
+        staticText.color = "white";
+        staticText.fontSize = 12;
+        staticTextTexture.addControl(staticText);
+
+        // Assign the left and right controllers to member variables
+        xrHelper.input.onControllerAddedObservable.add((inputSource) => {
+            if(inputSource.uniqueId.endsWith("right"))
+            {
+                this.rightController = inputSource;
+            }
+            else 
+            {
+                this.leftController = inputSource;
+
+                // Add the static text plane as a child of the controller
+                staticTextPlane.parent = this.leftController.pointer!;
+            }  
+        });
+
+        // Don't forget to deparent objects from the controllers or they will be destroyed!
+        xrHelper.input.onControllerRemovedObservable.add((inputSource) => {
+
+            if(inputSource.uniqueId.endsWith("right")) 
+            {
+                staticTextPlane.parent = null;
+            }
+        });
+
+
         this.scene.debugLayer.show(); 
     }
 
     // The main update loop will be executed once per frame before the scene is rendered
     private update() : void
     {
-        // Polling for controller input
-        this.processControllerInput();  
-    }
-
-    // Process event handlers for controller input
-    private processControllerInput()
-    {
-   
+ 
     }
 
 }

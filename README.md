@@ -1,4 +1,4 @@
-# Lecture 19: Immersive GUIs
+# Lecture 19: Immersive GUIs (Part 1)
 
 Detailed explanation of this code can be found in the [lecture video](https://mediaspace.umn.edu/media/1_euxqkbgi).
 
